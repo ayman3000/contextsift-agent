@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="455" viewBox="0 0 900 455">
+<rect width="100%" height="100%" fill="#ffffff" rx="18"/>
+<style>text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;fill:#0f172a}.title{font-size:25px;font-weight:750}.sub{font-size:13px;fill:#64748b}.label{font-size:14px;font-weight:650}.value{font-size:16px;font-weight:750}.small{font-size:12px;fill:#64748b}</style>
+<text x="38" y="44" class="title">Quality held; latency improved in this run</text>
+<text x="38" y="69" class="sub">Latency is a single-run observation, not yet a stable performance claim.</text>
+<text x="55" y="102" class="label">Task success</text>
+<text x="55" y="135" class="small">Baseline</text>
+<text x="405" y="135" text-anchor="end" class="value">100.00%</text>
+<rect x="55" y="153" width="350" height="43" rx="8" fill="#f1f5f9"/>
+<rect x="55" y="153" width="350.0" height="43" rx="8" fill="#475569"/>
+<text x="55" y="240" class="small">ContextSift</text>
+<text x="405" y="240" text-anchor="end" class="value">100.00%</text>
+<rect x="55" y="258" width="350" height="43" rx="8" fill="#f1f5f9"/>
+<rect x="55" y="258" width="350.0" height="43" rx="8" fill="#0f766e"/>
+<text x="485" y="102" class="label">Total wall time</text>
+<text x="485" y="135" class="small">Baseline</text>
+<text x="835" y="135" text-anchor="end" class="value">22.05s</text>
+<rect x="485" y="153" width="350" height="43" rx="8" fill="#f1f5f9"/>
+<rect x="485" y="153" width="350.0" height="43" rx="8" fill="#475569"/>
+<text x="485" y="240" class="small">ContextSift</text>
+<text x="835" y="240" text-anchor="end" class="value">12.66s</text>
+<rect x="485" y="258" width="350" height="43" rx="8" fill="#f1f5f9"/>
+<rect x="485" y="258" width="200.9" height="43" rx="8" fill="#0f766e"/>
+<text x="845" y="390" text-anchor="end" class="value">42.6% lower wall time</text>
+<text x="38" y="423" class="small">Both arms passed 5/5 tasks, including exact recovery of a deep historical tool detail.</text>
+</svg>

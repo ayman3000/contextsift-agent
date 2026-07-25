@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a scoped improvement to ContextSift
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What agent-context or tool-history problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evaluation plan
+      description: Explain how token use, correctness, latency, and failure modes should be measured.
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope acknowledgement
+      options:
+        - label: I understand ContextSift is currently an experimental POC.
+          required: true

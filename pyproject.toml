@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contextsift-agent"
+version = "0.1.0"
+description = "A lightweight agent with configurable active conversation history and lossless external tool artifacts."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "ContextSift Agent contributors" }]
+keywords = ["llm", "agents", "context-management", "ollama", "tool-calling"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.optional-dependencies]
+web = ["certifi>=2024.2.2"]
+
+[project.scripts]
+csift = "contextsift_agent.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

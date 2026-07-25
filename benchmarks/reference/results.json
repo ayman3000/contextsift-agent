@@ -1,0 +1,587 @@
+{
+  "run_id": "tool-history-20260725T090722Z",
+  "created_at": "2026-07-25T09:07:22.116893+00:00",
+  "question": "all main messages in both arms; retain versus externalize completed tool exchanges",
+  "model": "glm-5.2:cloud",
+  "provider": "Ollama OpenAI-compatible API",
+  "main_message_count": 40,
+  "historical_completed_tool_calls": 20,
+  "tasks": [
+    {
+      "id": "main_fact",
+      "prompt": "What is the project charter code recorded in our main conversation? Reply with only the code.",
+      "expected": "PROJECT-ATLAS-91"
+    },
+    {
+      "id": "tool_summary",
+      "prompt": "What summary seal was reported by historical tool call call-hist-003? Reply with only the seal.",
+      "expected": "SUMMARY-SEAL-440"
+    },
+    {
+      "id": "tool_deep_detail",
+      "prompt": "Find the exact deep checksum in historical tool call call-hist-005. If the raw result is external, use its ledger artifact with artifact_search. Reply with only the checksum.",
+      "expected": "DEEP-CHECKSUM-7729"
+    },
+    {
+      "id": "filesystem_tool",
+      "prompt": "Use filesystem_read_file to read BENCHMARK_FACTS.md. Reply with only the file probe code.",
+      "expected": "FILE-PROBE-7391",
+      "required_tool": "filesystem_read_file"
+    },
+    {
+      "id": "code_tool",
+      "prompt": "Use code_execute_python to calculate the sum of the squares of integers 1 through 20. Reply with only the integer result.",
+      "expected": "2870",
+      "required_tool": "code_execute_python"
+    }
+  ],
+  "arms": [
+    {
+      "arm": "full_history_baseline",
+      "initial_context": {
+        "message_count": 82,
+        "role_counts": {
+          "system": 2,
+          "user": 20,
+          "assistant": 40,
+          "tool": 20
+        },
+        "estimated_tokens_with_schemas": 23763,
+        "raw_tool_output_bytes": 70763,
+        "artifact_count": 0
+      },
+      "tasks": [
+        {
+          "id": "main_fact",
+          "prompt": "What is the project charter code recorded in our main conversation? Reply with only the code.",
+          "expected": "PROJECT-ATLAS-91",
+          "answer": "PROJECT-ATLAS-91",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [],
+          "tool_receipts": [],
+          "wall_seconds": 2.3471,
+          "model_calls": [
+            {
+              "elapsed_seconds": 2.3438,
+              "message_count": 83,
+              "role_counts": {
+                "system": 2,
+                "user": 21,
+                "assistant": 40,
+                "tool": 20
+              },
+              "estimated_message_tokens": 22901,
+              "prompt_tokens": 27529,
+              "completion_tokens": 8,
+              "total_tokens": 27537,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "tool_summary",
+          "prompt": "What summary seal was reported by historical tool call call-hist-003? Reply with only the seal.",
+          "expected": "SUMMARY-SEAL-440",
+          "answer": "SUMMARY-SEAL-440",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [],
+          "tool_receipts": [],
+          "wall_seconds": 2.0467,
+          "model_calls": [
+            {
+              "elapsed_seconds": 2.0459,
+              "message_count": 85,
+              "role_counts": {
+                "system": 2,
+                "user": 22,
+                "assistant": 41,
+                "tool": 20
+              },
+              "estimated_message_tokens": 22946,
+              "prompt_tokens": 27561,
+              "completion_tokens": 75,
+              "total_tokens": 27636,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "tool_deep_detail",
+          "prompt": "Find the exact deep checksum in historical tool call call-hist-005. If the raw result is external, use its ledger artifact with artifact_search. Reply with only the checksum.",
+          "expected": "DEEP-CHECKSUM-7729",
+          "answer": "DEEP-CHECKSUM-7729",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "artifact_search"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_w2ybjhg8",
+              "tool": "artifact_search",
+              "status": "error",
+              "summary": "Tool execution failed",
+              "duration_ms": 0
+            }
+          ],
+          "wall_seconds": 10.7408,
+          "model_calls": [
+            {
+              "elapsed_seconds": 6.6396,
+              "message_count": 87,
+              "role_counts": {
+                "system": 2,
+                "user": 23,
+                "assistant": 42,
+                "tool": 20
+              },
+              "estimated_message_tokens": 23011,
+              "prompt_tokens": 27610,
+              "completion_tokens": 258,
+              "total_tokens": 27868,
+              "cached_tokens": null,
+              "requested_tools": [
+                "artifact_search"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 4.0983,
+              "message_count": 89,
+              "role_counts": {
+                "system": 2,
+                "user": 23,
+                "assistant": 43,
+                "tool": 21
+              },
+              "estimated_message_tokens": 23168,
+              "prompt_tokens": 27742,
+              "completion_tokens": 135,
+              "total_tokens": 27877,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "filesystem_tool",
+          "prompt": "Use filesystem_read_file to read BENCHMARK_FACTS.md. Reply with only the file probe code.",
+          "expected": "FILE-PROBE-7391",
+          "required_tool": "filesystem_read_file",
+          "answer": "FILE-PROBE-7391",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "filesystem_read_file"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_8xhs9fp1",
+              "tool": "filesystem_read_file",
+              "status": "success",
+              "summary": "Read 3 of 3 lines",
+              "duration_ms": 0
+            }
+          ],
+          "wall_seconds": 3.3841,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.5586,
+              "message_count": 91,
+              "role_counts": {
+                "system": 2,
+                "user": 24,
+                "assistant": 44,
+                "tool": 21
+              },
+              "estimated_message_tokens": 23212,
+              "prompt_tokens": 27775,
+              "completion_tokens": 43,
+              "total_tokens": 27818,
+              "cached_tokens": null,
+              "requested_tools": [
+                "filesystem_read_file"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 1.8226,
+              "message_count": 93,
+              "role_counts": {
+                "system": 2,
+                "user": 24,
+                "assistant": 45,
+                "tool": 22
+              },
+              "estimated_message_tokens": 23379,
+              "prompt_tokens": 27932,
+              "completion_tokens": 10,
+              "total_tokens": 27942,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "code_tool",
+          "prompt": "Use code_execute_python to calculate the sum of the squares of integers 1 through 20. Reply with only the integer result.",
+          "expected": "2870",
+          "required_tool": "code_execute_python",
+          "answer": "2870",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "code_execute_python"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_1yc8jngc",
+              "tool": "code_execute_python",
+              "status": "success",
+              "summary": "Python exited with code 0",
+              "duration_ms": 38
+            }
+          ],
+          "wall_seconds": 3.5333,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.9379,
+              "message_count": 95,
+              "role_counts": {
+                "system": 2,
+                "user": 25,
+                "assistant": 46,
+                "tool": 22
+              },
+              "estimated_message_tokens": 23430,
+              "prompt_tokens": 27970,
+              "completion_tokens": 83,
+              "total_tokens": 28053,
+              "cached_tokens": null,
+              "requested_tools": [
+                "code_execute_python"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 1.5547,
+              "message_count": 97,
+              "role_counts": {
+                "system": 2,
+                "user": 25,
+                "assistant": 47,
+                "tool": 23
+              },
+              "estimated_message_tokens": 23626,
+              "prompt_tokens": 28155,
+              "completion_tokens": 5,
+              "total_tokens": 28160,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "passed": 5,
+        "task_count": 5,
+        "quality_percent": 100.0,
+        "actual_prompt_tokens": 222274,
+        "actual_completion_tokens": 617,
+        "model_call_count": 8,
+        "total_wall_seconds": 22.052,
+        "median_task_seconds": 3.3841
+      }
+    },
+    {
+      "arm": "contextsift",
+      "initial_context": {
+        "message_count": 42,
+        "role_counts": {
+          "system": 2,
+          "user": 20,
+          "assistant": 20,
+          "tool": 0
+        },
+        "estimated_tokens_with_schemas": 3466,
+        "raw_tool_output_bytes": 70763,
+        "artifact_count": 20
+      },
+      "tasks": [
+        {
+          "id": "main_fact",
+          "prompt": "What is the project charter code recorded in our main conversation? Reply with only the code.",
+          "expected": "PROJECT-ATLAS-91",
+          "answer": "PROJECT-ATLAS-91",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [],
+          "tool_receipts": [],
+          "wall_seconds": 0.8817,
+          "model_calls": [
+            {
+              "elapsed_seconds": 0.876,
+              "message_count": 43,
+              "role_counts": {
+                "system": 2,
+                "user": 21,
+                "assistant": 20
+              },
+              "estimated_message_tokens": 2954,
+              "prompt_tokens": 2960,
+              "completion_tokens": 8,
+              "total_tokens": 2968,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "tool_summary",
+          "prompt": "What summary seal was reported by historical tool call call-hist-003? Reply with only the seal.",
+          "expected": "SUMMARY-SEAL-440",
+          "answer": "SUMMARY-SEAL-440",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [],
+          "tool_receipts": [],
+          "wall_seconds": 1.6116,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.6025,
+              "message_count": 45,
+              "role_counts": {
+                "system": 2,
+                "user": 22,
+                "assistant": 21
+              },
+              "estimated_message_tokens": 2999,
+              "prompt_tokens": 2992,
+              "completion_tokens": 81,
+              "total_tokens": 3073,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "tool_deep_detail",
+          "prompt": "Find the exact deep checksum in historical tool call call-hist-005. If the raw result is external, use its ledger artifact with artifact_search. Reply with only the checksum.",
+          "expected": "DEEP-CHECKSUM-7729",
+          "answer": "DEEP-CHECKSUM-7729",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "artifact_search"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_insn5c69",
+              "tool": "artifact_search",
+              "status": "success",
+              "summary": "Found 1 matches",
+              "duration_ms": 1
+            }
+          ],
+          "wall_seconds": 2.9656,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.4222,
+              "message_count": 47,
+              "role_counts": {
+                "system": 2,
+                "user": 23,
+                "assistant": 22
+              },
+              "estimated_message_tokens": 3064,
+              "prompt_tokens": 3041,
+              "completion_tokens": 86,
+              "total_tokens": 3127,
+              "cached_tokens": null,
+              "requested_tools": [
+                "artifact_search"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 1.5261,
+              "message_count": 49,
+              "role_counts": {
+                "system": 2,
+                "user": 23,
+                "assistant": 23,
+                "tool": 1
+              },
+              "estimated_message_tokens": 3246,
+              "prompt_tokens": 3213,
+              "completion_tokens": 11,
+              "total_tokens": 3224,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "filesystem_tool",
+          "prompt": "Use filesystem_read_file to read BENCHMARK_FACTS.md. Reply with only the file probe code.",
+          "expected": "FILE-PROBE-7391",
+          "required_tool": "filesystem_read_file",
+          "answer": "FILE-PROBE-7391",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "filesystem_read_file"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_5xgscdx9",
+              "tool": "filesystem_read_file",
+              "status": "success",
+              "summary": "Read 3 of 3 lines",
+              "duration_ms": 0
+            }
+          ],
+          "wall_seconds": 2.6048,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.2623,
+              "message_count": 49,
+              "role_counts": {
+                "system": 2,
+                "user": 24,
+                "assistant": 23
+              },
+              "estimated_message_tokens": 3121,
+              "prompt_tokens": 3087,
+              "completion_tokens": 58,
+              "total_tokens": 3145,
+              "cached_tokens": null,
+              "requested_tools": [
+                "filesystem_read_file"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 1.3294,
+              "message_count": 51,
+              "role_counts": {
+                "system": 2,
+                "user": 24,
+                "assistant": 24,
+                "tool": 1
+              },
+              "estimated_message_tokens": 3288,
+              "prompt_tokens": 3243,
+              "completion_tokens": 10,
+              "total_tokens": 3253,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "code_tool",
+          "prompt": "Use code_execute_python to calculate the sum of the squares of integers 1 through 20. Reply with only the integer result.",
+          "expected": "2870",
+          "required_tool": "code_execute_python",
+          "answer": "2870",
+          "error": null,
+          "passed": true,
+          "expected_found": true,
+          "required_tool_succeeded": true,
+          "requested_tools": [
+            "code_execute_python"
+          ],
+          "tool_receipts": [
+            {
+              "call_id": "call_vmt2t8wx",
+              "tool": "code_execute_python",
+              "status": "success",
+              "summary": "Python exited with code 0",
+              "duration_ms": 45
+            }
+          ],
+          "wall_seconds": 4.593,
+          "model_calls": [
+            {
+              "elapsed_seconds": 1.412,
+              "message_count": 51,
+              "role_counts": {
+                "system": 2,
+                "user": 25,
+                "assistant": 24
+              },
+              "estimated_message_tokens": 3187,
+              "prompt_tokens": 3146,
+              "completion_tokens": 52,
+              "total_tokens": 3198,
+              "cached_tokens": null,
+              "requested_tools": [
+                "code_execute_python"
+              ],
+              "finish_reason": "tool_calls"
+            },
+            {
+              "elapsed_seconds": 3.1204,
+              "message_count": 53,
+              "role_counts": {
+                "system": 2,
+                "user": 25,
+                "assistant": 25,
+                "tool": 1
+              },
+              "estimated_message_tokens": 3381,
+              "prompt_tokens": 3333,
+              "completion_tokens": 5,
+              "total_tokens": 3338,
+              "cached_tokens": null,
+              "requested_tools": [],
+              "finish_reason": "stop"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "passed": 5,
+        "task_count": 5,
+        "quality_percent": 100.0,
+        "actual_prompt_tokens": 25015,
+        "actual_completion_tokens": 311,
+        "model_call_count": 8,
+        "total_wall_seconds": 12.6567,
+        "median_task_seconds": 2.6048
+      }
+    }
+  ]
+}

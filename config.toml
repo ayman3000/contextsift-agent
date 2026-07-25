@@ -1,0 +1,23 @@
+[agent]
+model = "glm-5.2:cloud"
+base_url = "http://127.0.0.1:11434/v1"
+api_key_env = ""
+api_key_required = false
+request_timeout_seconds = 300
+max_tool_calls_per_turn = 20
+
+[context]
+# 0 means all main user/assistant messages. This is the default.
+# Any positive value keeps only that many most-recent main messages.
+recent_main_messages = 0
+max_input_tokens = 32000
+retrieved_history_results = 5
+tool_ledger_entries = 20
+
+[tools]
+default_timeout_seconds = 60
+max_preview_bytes = 12000
+
+[web]
+api_key_env = "TAVILY_API_KEY"
+max_results = 5
