@@ -4,9 +4,15 @@ ContextSift is an experimental local-first agent runtime that keeps the complete
 
 > **Project status: proof of concept / alpha.** The core tool-history lifecycle is implemented and tested. ContextSift is not a production sandbox, does not yet enforce its configured token ceiling, and does not yet update durable memory or task state automatically.
 
-## Why ContextSift exists
+## Why?
 
-An active tool loop must show the model the tool call and its result. Many implementations keep those messages in one growing transcript after the turn finishes, so every later request resends already-consumed terminal logs, file contents, search results, and code output.
+Most agent frameworks resend the full conversation transcript — including completed tool calls and their raw results — on every model request. This causes:
+
+- The same terminal logs, file contents, and search results re-enter the prompt long after they were consumed.
+- Context length grows with session age, not with current task complexity.
+- Old, irrelevant text competes with the current request for model attention.
+- Token consumption and latency increase throughout a long session.
+- Eventually the framework must truncate or summarize under pressure, risking the loss of important constraints.
 
 The screenshots below show two real agentic coding sessions where message history — dominated by completed tool exchanges — consumed **86–87% of the entire context window**, leaving zero or near-zero free space:
 
@@ -16,13 +22,16 @@ The screenshots below show two real agentic coding sessions where message histor
 
 In both cases the frameworks already defer unused tool *schemas* (only ~7k of ~40k MCP tool tokens are active) but still resend completed tool *results* on every turn. ContextSift applies the same lazy-loading principle to tool output.
 
-ContextSift changes the lifecycle after a tool exchange completes:
+## What?
+
+ContextSift separates **active context** from **external memory**:
 
 - Keep every main user request and completed assistant response by default.
 - Keep the unfinished tool sequence while the model is using it.
 - Replace completed tool exchanges with compact receipts.
 - Store full outputs as local artifacts.
 - Let the model retrieve exact artifact evidence when it becomes relevant again.
+- Build every model request under an explicit token budget and record what was included.
 
 Removing a tool result from active context does not delete it.
 
@@ -41,58 +50,45 @@ flowchart LR
 
 See [the architecture notes](docs/ARCHITECTURE.md) for the request lifecycle and storage boundaries.
 
-## Measured result
+## How?
 
-The reference benchmark held the main history constant in both arms: 40 main messages and the same model, prompts, tools, and tasks. The baseline also retained 20 completed tool calls and 20 raw tool results. ContextSift replaced them with receipts and artifacts.
+### How it works
 
-| Arm | Provider-reported prompt tokens | Task success | Wall time |
-|---|---:|---:|---:|
-| Full-history tool baseline | 222,274 | 5/5 | 22.05s |
-| ContextSift | 25,015 | 5/5 | 12.66s |
+The agent loop keeps the full tool sequence active while the model is still using it. Once the model consumes a tool result and produces a completed response, later turns receive a compact receipt instead of the raw exchange:
 
-That is **88.7% fewer prompt tokens on this synthetic, tool-heavy workload**. It is not a universal reduction claim. The latency figure comes from one run and is not yet statistically stable. Ollama did not report cached prompt tokens, so the benchmark does not claim an equivalent provider-cost reduction.
+```text
+Current request
+      │
+      ▼
+Persistent identity and state ── agent.md / user.md / memory.md / state.md
+      │
+      ▼
+Recent main-message window ───── configurable; `0` includes all main messages
+      │
+      ▼
+Selective retrieval ──────────── SQLite FTS5 over conversation and tool receipts
+      │
+      ▼
+Budgeted context builder ─────── context manifest and token estimates
+      │
+      ▼
+Model ↔ bounded tool results ─── filesystem / terminal / Tavily / Python
+      │
+      ▼
+Lossless external storage ────── JSONL logs and artifact files
+```
 
-![Prompt token comparison](benchmarks/reference/charts/prompt_tokens.png)
+The active model context is a bounded working set. The external history is the lossless source of recall. Retrieval connects the two only when older information is relevant.
 
-- [Reference benchmark report](benchmarks/reference/REPORT.md)
-- [Sanitized reference metrics](benchmarks/reference/results.json)
-- [Fixed benchmark methodology](benchmarks/TEST_PLAN.md)
-- [Medium article draft](MEDIUM_ARTICLE_DRAFT.md)
+### How to install
 
-## What is implemented
-
-| Capability | Status | Notes |
-|---|---|---|
-| All-main-message mode | Implemented and tested | `recent_main_messages = 0`, the default |
-| Optional last-N main-message mode | Implemented and tested | Tool protocol messages do not consume the count |
-| Completed tool externalization | Implemented and tested | Only main user/completed assistant messages enter conversation history |
-| Compact tool ledger | Implemented and tested | Configurable receipt count; `0` includes every receipt |
-| Artifact storage and bounded retrieval | Implemented and tested | Exact byte-range reads and text search |
-| Filesystem tools | Implemented and tested | Confined to configured workspace roots |
-| Terminal tool | Implemented as a POC | No shell; small destructive-command denylist, not a security boundary |
-| Python execution | Implemented as a POC | Child process with sanitized environment, not OS-level isolation |
-| Tavily search | Implemented | Requires `TAVILY_API_KEY`; live test completed |
-| SQLite FTS5 history search | Implemented and tested | Lexical retrieval, not semantic retrieval |
-| Context manifests | Implemented and tested | Estimates input and reports `over_budget` |
-| Hard token-budget enforcement | **Not implemented** | The agent reports overflow but does not trim or reject requests |
-| Automatic `memory.md` updates | **Not implemented** | File is loaded as prompt context only |
-| Automatic `state.md` checkpoints | **Not implemented** | File is loaded as prompt context only |
-| Duplicate tool-call prevention | **Not implemented** | The ledger helps the model avoid repeats but no deterministic blocker exists |
-| Progressive tool-schema disclosure | **Not implemented** | All registered schemas are sent on every request |
-| Hardened execution sandbox | **Not implemented** | Use only in a disposable, trusted workspace |
-
-The [roadmap](ROADMAP.md) separates validated behavior from proposed work. The larger [POC specification](CONTEXTSIFT_AGENT_SPEC.md) is a design target and includes features beyond the current implementation.
-
-## Requirements
-
+**Requirements:**
 - Python 3.11 or newer
 - Ollama 0.32 or a compatible release
 - Access to the configured model; the default is `glm-5.2:cloud`
 - Optional Tavily API key for `web_search`
 
 The default provider is Ollama's OpenAI-compatible endpoint at `http://127.0.0.1:11434/v1`. Ollama cloud models may require signing in to Ollama.
-
-## Install
 
 ```bash
 # From a clone of this repository:
@@ -116,7 +112,7 @@ ollama pull glm-5.2:cloud
 ollama list
 ```
 
-## Quick start
+### How to run
 
 Check configuration without making a model request:
 
@@ -143,7 +139,7 @@ PYTHONPATH=src python3 -m contextsift_agent doctor
 PYTHONPATH=src python3 -m contextsift_agent chat
 ```
 
-## Configuration
+### How to configure
 
 The checked-in [config.toml](config.toml) defaults to all main messages:
 
@@ -182,6 +178,67 @@ export TAVILY_API_KEY="..."
 
 Never commit API keys or place them in prompt files.
 
+### How it is tested
+
+The offline suite does not call Ollama or Tavily:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests -v
+```
+
+The current suite covers context selection, tool externalization, artifact retrieval, provider serialization, filesystem containment, terminal output spilling, and Python secret-environment isolation.
+
+## Results & benchmark
+
+The reference benchmark held the main history constant in both arms: 40 main messages and the same model, prompts, tools, and tasks. The baseline also retained 20 completed tool calls and 20 raw tool results. ContextSift replaced them with receipts and artifacts.
+
+| Arm | Provider-reported prompt tokens | Task success | Wall time |
+|---|---:|---:|---:|
+| Full-history tool baseline | 222,274 | 5/5 | 22.05s |
+| ContextSift | 25,015 | 5/5 | 12.66s |
+
+That is **88.7% fewer prompt tokens on this synthetic, tool-heavy workload**. It is not a universal reduction claim. The latency figure comes from one run and is not yet statistically stable. Ollama did not report cached prompt tokens, so the benchmark does not claim an equivalent provider-cost reduction.
+
+![Prompt token comparison](benchmarks/reference/charts/prompt_tokens.png)
+
+- [Reference benchmark report](benchmarks/reference/REPORT.md)
+- [Sanitized reference metrics](benchmarks/reference/results.json)
+- [Fixed benchmark methodology](benchmarks/TEST_PLAN.md)
+- [Medium article draft](MEDIUM_ARTICLE_DRAFT.md)
+
+Reproduce the live benchmark (calls `glm-5.2:cloud` through Ollama, may consume provider quota):
+
+```bash
+PYTHONPATH=src python3 benchmarks/run_tool_history_benchmark.py
+python3 benchmarks/render_tool_history_results.py benchmarks/results/<run-id>/results.json
+```
+
+Each run creates a timestamped ignored directory. Compare your result with the checked-in [reference report](benchmarks/reference/REPORT.md), but expect model and infrastructure variance.
+
+## Implementation status
+
+| Capability | Status | Notes |
+|---|---|---|
+| All-main-message mode | Implemented and tested | `recent_main_messages = 0`, the default |
+| Optional last-N main-message mode | Implemented and tested | Tool protocol messages do not consume the count |
+| Completed tool externalization | Implemented and tested | Only main user/completed assistant messages enter conversation history |
+| Compact tool ledger | Implemented and tested | Configurable receipt count; `0` includes every receipt |
+| Artifact storage and bounded retrieval | Implemented and tested | Exact byte-range reads and text search |
+| Filesystem tools | Implemented and tested | Confined to configured workspace roots |
+| Terminal tool | Implemented as a POC | No shell; small destructive-command denylist, not a security boundary |
+| Python execution | Implemented as a POC | Child process with sanitized environment, not OS-level isolation |
+| Tavily search | Implemented | Requires `TAVILY_API_KEY`; live test completed |
+| SQLite FTS5 history search | Implemented and tested | Lexical retrieval, not semantic retrieval |
+| Context manifests | Implemented and tested | Estimates input and reports `over_budget` |
+| Hard token-budget enforcement | **Not implemented** | The agent reports overflow but does not trim or reject requests |
+| Automatic `memory.md` updates | **Not implemented** | File is loaded as prompt context only |
+| Automatic `state.md` checkpoints | **Not implemented** | File is loaded as prompt context only |
+| Duplicate tool-call prevention | **Not implemented** | The ledger helps the model avoid repeats but no deterministic blocker exists |
+| Progressive tool-schema disclosure | **Not implemented** | All registered schemas are sent on every request |
+| Hardened execution sandbox | **Not implemented** | Use only in a disposable, trusted workspace |
+
+The [roadmap](ROADMAP.md) separates validated behavior from proposed work. The larger [POC specification](CONTEXTSIFT_AGENT_SPEC.md) is a design target and includes features beyond the current implementation.
+
 ## Included tools
 
 - `filesystem_list_directory`
@@ -213,27 +270,6 @@ data/
 ```
 
 Conversation logs and tool artifacts can contain sensitive user or workspace data. Review them before sharing. Generated benchmark runs under `benchmarks/results/` are also ignored because they may contain absolute paths and raw model/tool output.
-
-## Tests
-
-The offline suite does not call Ollama or Tavily:
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests -v
-```
-
-The current suite covers context selection, tool externalization, artifact retrieval, provider serialization, filesystem containment, terminal output spilling, and Python secret-environment isolation.
-
-## Reproduce the live benchmark
-
-This calls `glm-5.2:cloud` through Ollama and may consume provider quota:
-
-```bash
-PYTHONPATH=src python3 benchmarks/run_tool_history_benchmark.py
-python3 benchmarks/render_tool_history_results.py benchmarks/results/<run-id>/results.json
-```
-
-Each run creates a timestamped ignored directory. Compare your result with the checked-in [reference report](benchmarks/reference/REPORT.md), but expect model and infrastructure variance.
 
 ## Security
 
