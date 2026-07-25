@@ -8,6 +8,14 @@ ContextSift is an experimental local-first agent runtime that keeps the complete
 
 An active tool loop must show the model the tool call and its result. Many implementations keep those messages in one growing transcript after the turn finishes, so every later request resends already-consumed terminal logs, file contents, search results, and code output.
 
+The screenshots below show two real agentic coding sessions where message history — dominated by completed tool exchanges — consumed **86–87% of the entire context window**, leaving zero or near-zero free space:
+
+![199.9k context, 0 free space](docs/motivation/context_199k.png)
+
+![886.9k / 1M context, 11% free](docs/motivation/agent_history.png)
+
+In both cases the frameworks already defer unused tool *schemas* (only ~7k of ~40k MCP tool tokens are active) but still resend completed tool *results* on every turn. ContextSift applies the same lazy-loading principle to tool output.
+
 ContextSift changes the lifecycle after a tool exchange completes:
 
 - Keep every main user request and completed assistant response by default.
